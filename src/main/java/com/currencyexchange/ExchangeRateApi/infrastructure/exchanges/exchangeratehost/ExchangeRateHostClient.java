@@ -7,12 +7,15 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.currencyexchange.ExchangeRateApi.contracts.external.responses.ExchangeRateHostResponse;
+import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,9 +43,15 @@ public class ExchangeRateHostClient implements IExchangeRateProvider {
 				return Optional.empty();
 			}
 
+			// the collect bellow converts Strings of type "ABCXYZ"
+			// into a CurrencyPair that has "ABC" as the From and "XYZ" as the To
 			return Optional.of(new ExchangeRatesFromBase(
 					response.getSource(),
-					response.getQuotes()));
+					response.getQuotes().entrySet().stream()
+							.collect(Collectors.toMap(
+									entry -> new CurrencyPair(entry.getKey().substring(0,3), entry.getKey().substring(3)),
+									Map.Entry::getValue))
+			));
 
 		} catch (Exception e) {
 			log.error("Error fetching exchange rates from ExchangeRate.host", e);

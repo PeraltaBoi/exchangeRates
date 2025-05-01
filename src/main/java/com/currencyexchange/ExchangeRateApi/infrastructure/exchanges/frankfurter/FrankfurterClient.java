@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.currencyexchange.ExchangeRateApi.contracts.external.responses.FrankfurterResponse;
+import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,10 +46,9 @@ public class FrankfurterClient implements IExchangeRateProvider {
 				return Optional.empty();
 			}
 
-			// Transform rates map to include source currency in each key
-			Map<String, Double> transformedRates = response.getRates().entrySet().stream()
+			Map<CurrencyPair, BigDecimal> transformedRates = response.getRates().entrySet().stream()
 					.collect(Collectors.toMap(
-							entry -> response.getBase() + entry.getKey(), // Create key like "EURUSD"
+							entry -> new CurrencyPair(response.getBase(), entry.getKey()),
 							Map.Entry::getValue));
 
 			return Optional.of(new ExchangeRatesFromBase(

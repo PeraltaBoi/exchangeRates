@@ -1,5 +1,6 @@
 package com.currencyexchange.ExchangeRateApi.contracts.external.responses;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import lombok.Data;
 
@@ -10,5 +11,5 @@ public class ExchangeRateHostResponse {
     private String privacy;
     private long timestamp;
     private String source;
-    private Map<String, Double> quotes;
+    private Map<String, BigDecimal> quotes;
 }

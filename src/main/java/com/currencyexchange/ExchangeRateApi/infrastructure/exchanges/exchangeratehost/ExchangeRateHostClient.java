@@ -1,5 +1,6 @@
 package com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.exchangeratehost;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -7,7 +8,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.currencyexchange.ExchangeRateApi.contracts.external.responses.ExchangeRateHostResponse;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
-import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRate;
+import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +17,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExchangeRateHostClient implements IExchangeRate {
+@Qualifier("exchangeRateHost")
+public class ExchangeRateHostClient implements IExchangeRateProvider {
 
 	private final RestTemplate restTemplate;
 
@@ -24,18 +26,17 @@ public class ExchangeRateHostClient implements IExchangeRate {
 	private String baseUrl;
 
 	@Override
-	public Optional<ExchangeRatesFromBase> getAllRates(String sourceCurrency) {
+	public Optional<ExchangeRatesFromBase> getAllRates() {
 		try {
 			String url = UriComponentsBuilder.fromUriString(baseUrl)
 					.path("/live")
-					.queryParam("source", sourceCurrency)
 					.build()
 					.toUriString();
 
 			ExchangeRateHostResponse response = restTemplate.getForObject(url, ExchangeRateHostResponse.class);
 
 			if (response == null || !response.isSuccess()) {
-				log.error("Failed to get exchange rates from ExchangeRate.host for source currency: {}", sourceCurrency);
+				log.error("Failed to get exchange rates from ExchangeRate.host");
 				return Optional.empty();
 			}
 

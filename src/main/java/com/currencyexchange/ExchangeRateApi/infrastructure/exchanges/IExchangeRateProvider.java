@@ -4,15 +4,14 @@ import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 
 import java.util.Optional;
 
-public interface IExchangeRate {
+public interface IExchangeRateProvider {
 	/**
 	 * Get all available exchange rates for a given source currency
 	 *
-	 * @param sourceCurrency the base currency code (e.g., "USD")
 	 * @return Optional containing exchange rates from base with all available rates
 	 *         if successful, empty if failed
 	 */
-	Optional<ExchangeRatesFromBase> getAllRates(String sourceCurrency);
+	Optional<ExchangeRatesFromBase> getAllRates();
 
 	/**
 	 * Get the name of the exchange rate provider

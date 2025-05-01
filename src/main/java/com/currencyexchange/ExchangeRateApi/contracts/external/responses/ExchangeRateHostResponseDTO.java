@@ -5,7 +5,7 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-public class ExchangeRateHostResponse {
+public class ExchangeRateHostResponseDTO {
     private boolean success;
     private String terms;
     private String privacy;

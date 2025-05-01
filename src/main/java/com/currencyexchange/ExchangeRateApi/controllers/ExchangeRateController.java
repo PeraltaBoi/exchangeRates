@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ExchangeRateResponse;
+import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ExchangeRateResponseDTO;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,9 +22,9 @@ public class ExchangeRateController {
 	private final IRateService rateService;
 
 	@GetMapping("/rates")
-	public ResponseEntity<ExchangeRateResponse> getAllRates(@RequestParam String from) {
+	public ResponseEntity<ExchangeRateResponseDTO> getAllRates(@RequestParam String from) {
 		return rateService.getAllExchangeRates(from)
-				.map(rates -> ResponseEntity.ok(ExchangeRateResponse.builder()
+				.map(rates -> ResponseEntity.ok(ExchangeRateResponseDTO.builder()
 						.from(from)
 						.rates(rates.getQuotes().entrySet().stream()
 								.collect(Collectors.toMap(

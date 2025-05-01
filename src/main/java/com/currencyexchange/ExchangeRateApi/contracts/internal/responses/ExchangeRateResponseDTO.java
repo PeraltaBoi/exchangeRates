@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExchangeRateResponse {
+public class ExchangeRateResponseDTO {
 	private String from;
 	private Map<String, BigDecimal> rates;
 }

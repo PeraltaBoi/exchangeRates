@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.currencyexchange.ExchangeRateApi.contracts.external.responses.FrankfurterResponse;
+import com.currencyexchange.ExchangeRateApi.contracts.external.responses.FrankfurterResponseDTO;
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
@@ -39,7 +39,7 @@ public class FrankfurterClient implements IExchangeRateProvider {
 					.build()
 					.toUriString();
 
-			FrankfurterResponse response = restTemplate.getForObject(url, FrankfurterResponse.class);
+			FrankfurterResponseDTO response = restTemplate.getForObject(url, FrankfurterResponseDTO.class);
 
 			if (response == null) {
 				log.error("Failed to get exchange rates from Frankfurter");

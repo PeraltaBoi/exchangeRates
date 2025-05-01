@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.currencyexchange.ExchangeRateApi.contracts.external.responses.ExchangeRateHostResponse;
+import com.currencyexchange.ExchangeRateApi.contracts.external.responses.ExchangeRateHostResponseDTO;
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
@@ -36,7 +36,7 @@ public class ExchangeRateHostClient implements IExchangeRateProvider {
 					.build()
 					.toUriString();
 
-			ExchangeRateHostResponse response = restTemplate.getForObject(url, ExchangeRateHostResponse.class);
+			ExchangeRateHostResponseDTO response = restTemplate.getForObject(url, ExchangeRateHostResponseDTO.class);
 
 			if (response == null || !response.isSuccess()) {
 				log.error("Failed to get exchange rates from ExchangeRate.host");

@@ -1,5 +1,6 @@
-package com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.frankfurter;
+package com.currencyexchange.ExchangeRateApi.contracts.external.responses;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import lombok.Data;
 
@@ -7,5 +8,5 @@ import lombok.Data;
 public class FrankfurterResponse {
 	private String base;
 	private String date;
-	private Map<String, Double> rates;
+	private Map<String, BigDecimal> rates;
 }

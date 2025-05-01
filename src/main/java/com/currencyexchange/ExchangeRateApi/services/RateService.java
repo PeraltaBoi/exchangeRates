@@ -3,7 +3,7 @@ package com.currencyexchange.ExchangeRateApi.services;
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
-import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
+import com.currencyexchange.ExchangeRateApi.services.interfaces.IExchangeRateProviderService;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
 
 import lombok.NonNull;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RateService implements IRateService {
-  private final IExchangeRateProvider exchangeRateProvider;
+  private final IExchangeRateProviderService exchangeRateProvider;
   private final MathContext mc = new MathContext(10, RoundingMode.HALF_UP);
 
   /**
@@ -36,7 +36,7 @@ public class RateService implements IRateService {
    * Get all exchange rates for a source currency
    */
   public Optional<ExchangeRates> getAllExchangeRates(String sourceCurrency) {
-    return getExchangeRates()
+    return exchangeRateProvider.getExchangeRates()
         .map(this::createExchangePairs)
         .map(rates -> filterExchangeRates(rates, sourceCurrency));
   }
@@ -54,21 +54,6 @@ public class RateService implements IRateService {
   public Map<String, Optional<BigDecimal>> convertAmountToMultipleCurrencies(BigDecimal amount, String sourceCurrency,
       List<String> targetCurrencies) {
     return Map.of();
-  }
-
-  /**
-   * Retrieves all exchange rates from the provider.
-   * All rates are from the same (provider default) currency to some other.
-   * 
-   * @return An Optional containing {@link ExchangeRatesFromBase} with the source
-   *         currency and its quotes,
-   *         or empty Optional if no rates are available from the provider.
-   * @see ExchangeRatesFromBase
-   * @see ExchangeRateProvider#getAllRates()
-   */
-  private Optional<ExchangeRatesFromBase> getExchangeRates() {
-    return exchangeRateProvider.getAllRates()
-        .map(rates -> new ExchangeRatesFromBase(rates.getSource(), rates.getQuotes()));
   }
 
   /**

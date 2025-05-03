@@ -29,7 +29,9 @@ public class RateService implements IRateService {
    * Get exchange rate between two currencies
    */
   public Optional<BigDecimal> getExchangeRate(String sourceCurrency, String targetCurrency) {
-    return Optional.empty();
+    return exchangeRateProvider.getExchangeRates()
+        .map(this::createExchangePairs)
+        .flatMap(rates -> getExchangeRate(rates, sourceCurrency, targetCurrency));
   }
 
   /**
@@ -114,5 +116,24 @@ public class RateService implements IRateService {
             Map.Entry::getValue));
 
     return new ExchangeRates(filteredQuotes);
+  }
+
+  /**
+   * Gets the exchange rate for a specific currency pair.
+   * 
+   * @param rates The exchange rates containing all currency pairs
+   * @param from  The source currency code (e.g., "EUR", "USD")
+   * @param to    The target currency code (e.g., "EUR", "USD")
+   * @return Optional containing the exchange rate if found, empty Optional
+   *         otherwise
+   */
+  private Optional<BigDecimal> getExchangeRate(@NonNull ExchangeRates rates,
+      @NonNull String from,
+      @NonNull String to) {
+    return rates.getQuotes().entrySet().stream()
+        .filter(entry -> from.equals(entry.getKey().getFrom())
+            && to.equals(entry.getKey().getTo()))
+        .map(Map.Entry::getValue)
+        .findFirst();
   }
 }

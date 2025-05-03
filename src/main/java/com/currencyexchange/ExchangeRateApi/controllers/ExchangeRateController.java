@@ -1,6 +1,7 @@
 package com.currencyexchange.ExchangeRateApi.controllers;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
@@ -22,15 +23,29 @@ public class ExchangeRateController {
 	private final IRateService rateService;
 
 	@GetMapping("/rates")
-	public ResponseEntity<ExchangeRateResponseDTO> getAllRates(@RequestParam String from) {
-		return rateService.getAllExchangeRates(from)
-				.map(rates -> ResponseEntity.ok(ExchangeRateResponseDTO.builder()
-						.from(from)
-						.rates(rates.getQuotes().entrySet().stream()
-								.collect(Collectors.toMap(
-										entry -> entry.getKey().getTo(),
-										Map.Entry::getValue)))
-						.build()))
-				.orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<ExchangeRateResponseDTO> getAllRates(
+			@RequestParam String from,
+			@RequestParam Optional<String> to) {
+		if (to.isPresent()) {
+			String toCurrency = to.get();
+			return rateService.getExchangeRate(from, toCurrency)
+					.map(rate -> ResponseEntity.ok(
+							ExchangeRateResponseDTO.builder()
+									.from(from)
+									.rates(Map.of(toCurrency, rate))
+									.build()))
+					.orElse(ResponseEntity.notFound().build());
+		} else {
+			return rateService.getAllExchangeRates(from)
+					.map(rates -> ResponseEntity.ok(
+							ExchangeRateResponseDTO.builder()
+									.from(from)
+									.rates(rates.getQuotes().entrySet().stream()
+											.collect(Collectors.toMap(
+													entry -> entry.getKey().getTo(),
+													Map.Entry::getValue)))
+									.build()))
+					.orElse(ResponseEntity.notFound().build());
+		}
 	}
 }

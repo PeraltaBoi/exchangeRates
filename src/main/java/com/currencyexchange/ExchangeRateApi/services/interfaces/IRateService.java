@@ -11,12 +11,12 @@ public interface IRateService {
     /**
      * Get exchange rate between two currencies
      */
-    Optional<BigDecimal> getExchangeRate(String sourceCurrency, String targetCurrency);
+    BigDecimal getExchangeRate(String sourceCurrency, String targetCurrency);
 
     /**
      * Get all exchange rates for a source currency
      */
-    Optional<ExchangeRates> getAllExchangeRates(String sourceCurrency);
+    ExchangeRates getAllExchangeRates(String sourceCurrency);
 
     /**
      * Convert amount from source currency to target currency

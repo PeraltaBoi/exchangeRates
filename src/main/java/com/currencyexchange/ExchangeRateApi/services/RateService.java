@@ -3,6 +3,7 @@ package com.currencyexchange.ExchangeRateApi.services;
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
+import com.currencyexchange.ExchangeRateApi.exceptions.ExchangeRateNotFoundException;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IExchangeRateProviderService;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
 
@@ -28,19 +29,20 @@ public class RateService implements IRateService {
   /**
    * Get exchange rate between two currencies
    */
-  public Optional<BigDecimal> getExchangeRate(String sourceCurrency, String targetCurrency) {
+  public BigDecimal getExchangeRate(String sourceCurrency, String targetCurrency) {
     return exchangeRateProvider.getExchangeRates()
         .map(this::createExchangePairs)
-        .flatMap(rates -> getExchangeRate(rates, sourceCurrency, targetCurrency));
+        .flatMap(rates -> getExchangeRate(rates, sourceCurrency, targetCurrency)).orElseThrow(() -> new ExchangeRateNotFoundException(sourceCurrency, targetCurrency));
   }
 
   /**
    * Get all exchange rates for a source currency
    */
-  public Optional<ExchangeRates> getAllExchangeRates(String sourceCurrency) {
+  public ExchangeRates getAllExchangeRates(String sourceCurrency) {
     return exchangeRateProvider.getExchangeRates()
         .map(this::createExchangePairs)
-        .map(rates -> filterExchangeRates(rates, sourceCurrency));
+        .flatMap(rates -> filterExchangeRates(rates, sourceCurrency))
+        .orElseThrow(() -> new ExchangeRateNotFoundException(sourceCurrency));
   }
 
   /**
@@ -108,14 +110,18 @@ public class RateService implements IRateService {
    * @return A new ExchangeRates object containing only rates for the specified
    *         source currency
    */
-  private ExchangeRates filterExchangeRates(@NonNull ExchangeRates rates, @NonNull String from) {
+  private Optional<ExchangeRates> filterExchangeRates(@NonNull ExchangeRates rates, @NonNull String from) {
     Map<CurrencyPair, BigDecimal> filteredQuotes = rates.getQuotes().entrySet().stream()
         .filter(entry -> from.equals(entry.getKey().getFrom()))
         .collect(Collectors.toMap(
             Map.Entry::getKey,
             Map.Entry::getValue));
 
-    return new ExchangeRates(filteredQuotes);
+    if (filteredQuotes.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(new ExchangeRates(filteredQuotes));
   }
 
   /**

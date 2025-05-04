@@ -2,17 +2,17 @@ package com.currencyexchange.ExchangeRateApi.contracts.internal.responses;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExchangeRateResponseDTO {
-	private String from;
-	private Map<String, BigDecimal> rates;
+public record ExchangeRateResponseDTO(
+		String from,
+		Map<String, BigDecimal> rates) {
+
+	public ExchangeRateResponseDTO(String from, ExchangeRates exchangeRates) {
+		this(from, exchangeRates.getQuotes().entrySet().stream().collect(Collectors.toMap(
+				entry -> entry.getKey().getTo(),
+				Map.Entry::getValue)));
+	}
 }

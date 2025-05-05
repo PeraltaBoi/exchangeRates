@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ErrorResponse;
+import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ErrorResponseDTO;
 import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ExchangeRateResponseDTO;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
 
@@ -31,9 +31,9 @@ public class ExchangeRateController {
 	@Operation(summary = "Get exchange rates", description = "Retrieve exchange rate(s) for a given base currency. Optionally specify a target currency to get a single conversion rate.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Exchange rate(s) retrieved successfully", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ExchangeRateResponseDTO.class))),
-			@ApiResponse(responseCode = "400", description = "No rates found for requested currency/currencies", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ErrorResponse.class)))
+			@ApiResponse(responseCode = "400", description = "No rates found for requested currency/currencies", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ErrorResponseDTO.class)))
 	})
-	public ResponseEntity<ExchangeRateResponseDTO> getAllRates(
+	public ResponseEntity<ExchangeRateResponseDTO> getRates(
 			@Parameter(description = "Base currency code (e.g., USD)", required = true) @RequestParam String from,
 			@Parameter(description = "Target currency code (e.g., EUR). If not provided, all exchange rates will be returned.") @RequestParam Optional<String> to) {
 		String fromCurrency = from.toUpperCase();

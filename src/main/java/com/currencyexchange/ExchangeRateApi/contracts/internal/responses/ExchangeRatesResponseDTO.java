@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
 
-public record ExchangeRateResponseDTO(
+public record ExchangeRatesResponseDTO(
 		String from,
 		Map<String, BigDecimal> rates) {
 
-	public ExchangeRateResponseDTO(String from, ExchangeRates exchangeRates) {
+	public ExchangeRatesResponseDTO(String from, ExchangeRates exchangeRates) {
 		this(from, exchangeRates.getQuotes().entrySet().stream().collect(Collectors.toMap(
 				entry -> entry.getKey().getTo(),
 				Map.Entry::getValue)));

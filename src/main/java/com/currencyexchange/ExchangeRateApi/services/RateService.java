@@ -32,7 +32,8 @@ public class RateService implements IRateService {
   public BigDecimal getExchangeRate(String sourceCurrency, String targetCurrency) {
     return exchangeRateProvider.getExchangeRates()
         .map(this::createExchangePairs)
-        .flatMap(rates -> getExchangeRate(rates, sourceCurrency, targetCurrency)).orElseThrow(() -> new ExchangeRateNotFoundException(sourceCurrency, targetCurrency));
+        .flatMap(rates -> getExchangeRate(rates, sourceCurrency, targetCurrency))
+        .orElseThrow(() -> new ExchangeRateNotFoundException(sourceCurrency, targetCurrency));
   }
 
   /**
@@ -46,18 +47,14 @@ public class RateService implements IRateService {
   }
 
   /**
-   * Convert amount from source currency to target currency
-   */
-  public Optional<BigDecimal> convertAmount(BigDecimal amount, String sourceCurrency, String targetCurrency) {
-    return Optional.empty();
-  }
-
-  /**
    * Convert amount from source currency to multiple target currencies
    */
-  public Map<String, Optional<BigDecimal>> convertAmountToMultipleCurrencies(BigDecimal amount, String sourceCurrency,
+  public Map<String, BigDecimal> convertAmount(BigDecimal amount, String sourceCurrency,
       List<String> targetCurrencies) {
-    return Map.of();
+    return targetCurrencies.stream()
+        .collect(Collectors.toMap(
+            targetCurrency -> targetCurrency,
+            targetCurrency -> convertAmountToCurrency(amount, sourceCurrency, targetCurrency)));
   }
 
   /**
@@ -141,5 +138,18 @@ public class RateService implements IRateService {
             && to.equals(entry.getKey().getTo()))
         .map(Map.Entry::getValue)
         .findFirst();
+  }
+
+  /**
+   * Convert amount from source currency to target currency
+   * 
+   * @param amount         The amount to be converted
+   * @param sourceCurrency The source currency code (e.g., "EUR", "USD")
+   * @param targetCurrency The target currency code (e.g., "EUR", "USD")
+   * @return The converted amount
+   */
+  private BigDecimal convertAmountToCurrency(BigDecimal amount, String sourceCurrency, String targetCurrency) {
+    BigDecimal exchangeRate = getExchangeRate(sourceCurrency, targetCurrency);
+    return amount.multiply(exchangeRate);
   }
 }

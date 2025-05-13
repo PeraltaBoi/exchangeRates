@@ -2,7 +2,6 @@ package com.currencyexchange.ExchangeRateApi.services;
 
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
-import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.exceptions.ExchangeRateNotFoundException;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IExchangeRateProviderService;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
@@ -12,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,14 +20,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RateService implements IRateService {
   private final IExchangeRateProviderService exchangeRateProvider;
-  private final MathContext mc = new MathContext(10, RoundingMode.HALF_UP);
-
   /**
    * Get exchange rate between two currencies
    */
   public BigDecimal getExchangeRate(String sourceCurrency, String targetCurrency) {
     return exchangeRateProvider.getExchangeRates()
-        .map(this::createExchangePairs)
         .flatMap(rates -> getExchangeRate(rates, sourceCurrency, targetCurrency))
         .orElseThrow(() -> new ExchangeRateNotFoundException(sourceCurrency, targetCurrency));
   }
@@ -41,7 +34,6 @@ public class RateService implements IRateService {
    */
   public ExchangeRates getAllExchangeRates(String sourceCurrency) {
     return exchangeRateProvider.getExchangeRates()
-        .map(this::createExchangePairs)
         .flatMap(rates -> filterExchangeRates(rates, sourceCurrency))
         .orElseThrow(() -> new ExchangeRateNotFoundException(sourceCurrency));
   }
@@ -55,48 +47,6 @@ public class RateService implements IRateService {
         .collect(Collectors.toMap(
             targetCurrency -> targetCurrency,
             targetCurrency -> convertAmountToCurrency(amount, sourceCurrency, targetCurrency)));
-  }
-
-  /**
-   * Creates a complete map of exchange rate pairs including direct, inverse, and
-   * cross rates.
-   * Currency pairs are formatted as FROMTO (e.g., USDEUR, EURUSD)
-   *
-   * @param response The exchange rates response containing base currency and
-   *                 rates
-   * @return ExchangeRates containing all possible currency pairs and their rates
-   * @throws IllegalArgumentException if response contains invalid or empty data
-   */
-  @NonNull
-  private ExchangeRates createExchangePairs(@NonNull ExchangeRatesFromBase baseRates) {
-    Map<CurrencyPair, BigDecimal> sourceRates = baseRates.getQuotes();
-    if (sourceRates.isEmpty()) {
-      throw new IllegalArgumentException("Exchange rates cannot be empty");
-    }
-
-    Map<CurrencyPair, BigDecimal> pairs = new HashMap<>();
-    String sourceCurrency = baseRates.getSource();
-
-    sourceRates.forEach((key, rate) -> {
-      String targetCurrency = key.getTo();
-
-      // Add direct rate
-      pairs.put(new CurrencyPair(sourceCurrency, targetCurrency), rate);
-
-      // Add inverse rate
-      pairs.put(new CurrencyPair(targetCurrency, sourceCurrency), BigDecimal.ONE.divide(rate, mc));
-
-      // Calculate cross rates between all currencies except the base
-      sourceRates.forEach((key2, rate2) -> {
-        String targetCurrency2 = key2.getTo();
-        if (!targetCurrency.equals(targetCurrency2)) {
-          // Cross rate: rate2/rate1 (e.g., GBPJPY = EURGBP/EURJPY)
-          pairs.put(new CurrencyPair(targetCurrency, targetCurrency2), rate2.divide(rate, mc));
-        }
-      });
-    });
-
-    return new ExchangeRates(pairs);
   }
 
   /**

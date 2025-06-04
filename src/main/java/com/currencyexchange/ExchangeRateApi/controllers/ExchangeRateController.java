@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ConvertedAmountsResponseDTO;
-import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ErrorResponseDTO;
-import com.currencyexchange.ExchangeRateApi.contracts.internal.responses.ExchangeRatesResponseDTO;
+import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ConvertedAmountsResponseDTO;
+import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ExchangeRatesResponseDTO;
+import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ErrorResponseDTO;
+
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
 
 import io.swagger.v3.oas.annotations.Operation;

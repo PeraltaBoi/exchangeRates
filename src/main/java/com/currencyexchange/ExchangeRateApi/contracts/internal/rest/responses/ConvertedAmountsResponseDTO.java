@@ -1,4 +1,4 @@
-package com.currencyexchange.ExchangeRateApi.contracts.internal.responses;
+package com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses;
 
 import java.math.BigDecimal;
 import java.util.Map;

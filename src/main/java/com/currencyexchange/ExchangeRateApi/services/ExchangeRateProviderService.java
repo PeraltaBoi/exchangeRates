@@ -88,5 +88,4 @@ public class ExchangeRateProviderService implements IExchangeRateProviderService
 
     return new ExchangeRates(pairs);
   }
-
 }

@@ -15,8 +15,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(error, ex.getStatusCode());
 	}
 
-	@ExceptionHandler(RateLimitException.class)
-	public ResponseEntity<ErrorResponseDTO> handleRateLimitException(RateLimitException ex) {
+	@ExceptionHandler(ApiKeyNotFoundException.class)
+	public ResponseEntity<ErrorResponseDTO> handleApiKeyNotFoundException(ApiKeyNotFoundException ex) {
+		ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage());
+		return new ResponseEntity<>(error, ex.getStatusCode());
+	}
+
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<ErrorResponseDTO> handleUnauthorizedException(UnauthorizedException ex) {
 		ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage());
 		return new ResponseEntity<>(error, ex.getStatusCode());
 	}

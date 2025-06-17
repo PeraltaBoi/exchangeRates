@@ -3,18 +3,21 @@ package com.currencyexchange.ExchangeRateApi.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.requests.UserAuthRequestDTO;
+import com.currencyexchange.ExchangeRateApi.domain.ApiKeyRevokeStatus;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IAuthenticationService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,14 +26,16 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController {
 
   // a few methods from this service only return void
-  // if they return successfuly then everything went ok
+  // if they return successfully then everything went ok
   // otherwise, they throw exceptions that get handled
   // by the global exception handler
   private final IAuthenticationService authenticationService;
 
   @PostMapping("/signUp")
   public ResponseEntity<Boolean> signUp(
-      @RequestBody UserAuthRequestDTO authDTO) {
+      @Valid @RequestBody UserAuthRequestDTO authDTO) {
+      System.out.println("authDTO: " + authDTO);
+      System.out.println("authDto: " + authDTO.getPassword());
     authenticationService.signUp(authDTO.getUsername(), authDTO.getPassword());
     return ResponseEntity.ok().build();
   }
@@ -42,7 +47,7 @@ public class AuthenticationController {
     return ResponseEntity.ok().build();
   }
 
-  @GetMapping("/keys")
+  @PostMapping("/keys")
   public ResponseEntity<List<UUID>> getUserKeys(
       // GET requests shouldn't have bodies,
       // but i don't want to include the password in the url
@@ -60,8 +65,17 @@ public class AuthenticationController {
   public ResponseEntity<Void> revokeApiKey(
       @PathVariable("key") UUID apiKey,
       @RequestBody UserAuthRequestDTO authDTO) {
-    authenticationService.revokeApiKey(authDTO.getUsername(), authDTO.getPassword(), apiKey);
-    return ResponseEntity.ok().build();
+    ApiKeyRevokeStatus status = authenticationService.revokeApiKey(
+        authDTO.getUsername(),
+        authDTO.getPassword(),
+        apiKey);
+
+    return switch (status) {
+      case SUCCESS -> ResponseEntity.ok().build();
+      case INVALID_CREDENTIALS -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      case KEY_NOT_FOUND -> ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      case KEY_ALREADY_REVOKED -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+    };
   }
 
   @GetMapping("/key/{key}/validate")

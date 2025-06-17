@@ -11,13 +11,13 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Request body for user authentication operations")
-public class UserAuthRequestDTO{
+public class UserAuthRequestDTO {
 
-    @NotBlank(message = "Username is required")
-    @Schema(description = "Account's username", example = "john_doe")
-    private String username;
+  @NotBlank(message = "Username is required")
+  @Schema(description = "Account's username", example = "john_doe")
+  private String username;
 
-    @NotBlank(message = "Password is required")
-    @Schema(description = "Account' password", example = "SecurePass123!")
-    private String password;
+  @NotBlank(message = "Password is required")
+  @Schema(description = "Account' password", example = "SecurePass123!")
+  private String password;
 }

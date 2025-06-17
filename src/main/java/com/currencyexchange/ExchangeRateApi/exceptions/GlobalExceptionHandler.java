@@ -26,4 +26,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage());
 		return new ResponseEntity<>(error, ex.getStatusCode());
 	}
+
+	@ExceptionHandler(UsernameAlreadyExistsException.class)
+	public ResponseEntity<ErrorResponseDTO> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+		ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage());
+		return new ResponseEntity<>(error, ex.getStatusCode());
+	}
 }

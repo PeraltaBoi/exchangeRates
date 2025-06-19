@@ -4,11 +4,11 @@ import org.springframework.http.HttpStatus;
 
 public class ApiKeyNotFoundException extends RuntimeException {
 
-	public ApiKeyNotFoundException() {
-		super(String.format("No such api key on user's account"));
+	public ApiKeyNotFoundException(String message) {
+		super(message);
 	}
 
 	public HttpStatus getStatusCode() {
-		return HttpStatus.NOT_FOUND;
+		return HttpStatus.UNAUTHORIZED;
 	}
 }

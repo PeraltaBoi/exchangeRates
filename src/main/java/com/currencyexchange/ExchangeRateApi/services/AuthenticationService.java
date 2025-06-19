@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.currencyexchange.ExchangeRateApi.domain.ApiKeyRevokeStatus;
+import com.currencyexchange.ExchangeRateApi.exceptions.ApiKeyNotFoundException;
 import com.currencyexchange.ExchangeRateApi.exceptions.UnauthorizedException;
 import com.currencyexchange.ExchangeRateApi.exceptions.UsernameAlreadyExistsException;
 import com.currencyexchange.ExchangeRateApi.infrastructure.persistence.entities.ApiKey;
@@ -90,6 +91,11 @@ public class AuthenticationService implements IAuthenticationService {
 
   public boolean checkApiKey(UUID apiKey) {
         return apiKeyRepository.existsByKeyAndRevokedFalse(apiKey);
+  }
+
+  public User getUserFromApiKey(UUID apiKey) {
+        return apiKeyRepository.findUserByKey(apiKey)
+            .orElseThrow(() -> new ApiKeyNotFoundException("Invalid API key"));
   }
 
   private User getAuthenticatedUser(String username, String password) {

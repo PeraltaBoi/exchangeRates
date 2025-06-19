@@ -49,8 +49,9 @@ public class AuthenticationController {
 
   @PostMapping("/keys")
   public ResponseEntity<List<UUID>> getUserKeys(
-      // GET requests shouldn't have bodies,
-      // but i don't want to include the password in the url
+      // this should be a GET request
+      // but GET requests shouldn't have bodies,
+      // and i don't want to include the password in the url
       @RequestBody UserAuthRequestDTO authDTO) {
     return ResponseEntity.ok(authenticationService.getUserKeys(authDTO.getUsername(), authDTO.getPassword()));
   }

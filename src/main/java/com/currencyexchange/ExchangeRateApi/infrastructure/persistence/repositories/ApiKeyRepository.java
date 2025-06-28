@@ -21,5 +21,5 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, String> {
 
   boolean existsByKeyAndRevokedFalse(UUID key);
 
-  Optional<User> findUserByKey(UUID key);
+  Optional<ApiKey> findByKey(UUID key);
 }

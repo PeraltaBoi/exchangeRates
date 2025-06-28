@@ -1,12 +1,14 @@
 package com.currencyexchange.ExchangeRateApi.filters;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.currencyexchange.ExchangeRateApi.exceptions.ApiKeyNotFoundException;
 import com.currencyexchange.ExchangeRateApi.infrastructure.persistence.entities.User;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IAuthenticationService;
 
@@ -29,12 +31,24 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     UUID apiKeyValue = Optional.ofNullable(request.getHeader(headerName))
-        .map(UUID::fromString)
-        .orElseThrow(() -> new ApiKeyNotFoundException("Invalid API key format"));
+        .map(UUID::fromString).orElse(null);
+
+    if (apiKeyValue == null) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
     User user = authenticationService.getUserFromApiKey(apiKeyValue);
 
-    request.setAttribute("authenticatedUser", user);
+    if (user != null) {
+      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null,
+          Collections.emptyList());
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      request.setAttribute("authenticatedUser", user);
+    } else {
+      SecurityContextHolder.clearContext();
+    }
 
     filterChain.doFilter(request, response);
   }

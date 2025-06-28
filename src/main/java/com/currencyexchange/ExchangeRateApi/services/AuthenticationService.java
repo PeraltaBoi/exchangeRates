@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.currencyexchange.ExchangeRateApi.domain.ApiKeyRevokeStatus;
 import com.currencyexchange.ExchangeRateApi.exceptions.ApiKeyNotFoundException;
@@ -90,12 +91,14 @@ public class AuthenticationService implements IAuthenticationService {
   }
 
   public boolean checkApiKey(UUID apiKey) {
-        return apiKeyRepository.existsByKeyAndRevokedFalse(apiKey);
+    return apiKeyRepository.existsByKeyAndRevokedFalse(apiKey);
   }
 
+  @Transactional(readOnly = true)
   public User getUserFromApiKey(UUID apiKey) {
-        return apiKeyRepository.findUserByKey(apiKey)
-            .orElseThrow(() -> new ApiKeyNotFoundException("Invalid API key"));
+    return apiKeyRepository.findByKey(apiKey)
+        .map(ApiKey::getUser)
+        .orElseThrow(() -> new ApiKeyNotFoundException("Invalid API key"));
   }
 
   private User getAuthenticatedUser(String username, String password) {

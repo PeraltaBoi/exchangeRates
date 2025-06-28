@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.currencyexchange.ExchangeRateApi.filters.ApiKeyAuthFilter;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IAuthenticationService;
+import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateLimitingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
   private final IAuthenticationService authenticationService;
+  private final IRateLimitingService rateLimitingService;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,7 +32,7 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/auth/**", "/swagger-ui/**").permitAll()
             .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll())
-        .addFilterBefore(new ApiKeyAuthFilter(authenticationService, "X-API-KEY"),
+        .addFilterBefore(new ApiKeyAuthFilter(authenticationService, rateLimitingService, "X-API-KEY"),
             UsernamePasswordAuthenticationFilter.class)
         .formLogin(form -> form.disable());
 

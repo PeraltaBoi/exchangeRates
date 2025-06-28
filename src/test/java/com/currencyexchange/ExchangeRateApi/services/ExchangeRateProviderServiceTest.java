@@ -1,12 +1,13 @@
 package com.currencyexchange.ExchangeRateApi.services;
 
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
-import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
-import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
-import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
-import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
+import com.currencyexchange.ExchangeRateApi.domain.ExchangeRates;
+import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
+import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
 
 @ExtendWith(MockitoExtension.class)
 class ExchangeRateProviderServiceTest {

@@ -1,4 +1,4 @@
-package com.currencyexchange.ExchangeRateApi.infrastructure.config;
+package com.currencyexchange.ExchangeRateApi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

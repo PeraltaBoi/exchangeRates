@@ -34,8 +34,6 @@ public class AuthenticationController {
   @PostMapping("/signUp")
   public ResponseEntity<Boolean> signUp(
       @Valid @RequestBody UserAuthRequestDTO authDTO) {
-      System.out.println("authDTO: " + authDTO);
-      System.out.println("authDto: " + authDTO.getPassword());
     authenticationService.signUp(authDTO.getUsername(), authDTO.getPassword());
     return ResponseEntity.ok().build();
   }

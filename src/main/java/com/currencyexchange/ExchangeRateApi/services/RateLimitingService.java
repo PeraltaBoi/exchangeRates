@@ -47,11 +47,36 @@ public class RateLimitingService implements IRateLimitingService {
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   private List<Long> getTimestamps(String key) {
     Cache.ValueWrapper valueWrapper = cache.get(key);
     if (valueWrapper != null && valueWrapper.get() != null) {
-      return new LinkedList<>((List<Long>) valueWrapper.get());
+      Object cachedObject = valueWrapper.get();
+      if (cachedObject instanceof List) {
+        List<?> rawList = (List<?>) cachedObject;
+        List<Long> timestamps = new LinkedList<>();
+        for (Object item : rawList) {
+          if (item instanceof Long) {
+            timestamps.add((Long) item);
+          } else {
+            throw new IllegalArgumentException(
+                "Cache data corruption for key '"
+                    + key
+                    + "': Expected elements of type Long, but found "
+                    + (item != null ? item.getClass().getName() : "null")
+                    + ".");
+          }
+        }
+        return timestamps;
+      } else {
+        throw new IllegalArgumentException(
+            "Cache data corruption for key '"
+                + key
+                + "': Expected List, but found "
+                + (cachedObject != null
+                    ? cachedObject.getClass().getName()
+                    : "null")
+                + ".");
+      }
     }
     return new LinkedList<>();
   }

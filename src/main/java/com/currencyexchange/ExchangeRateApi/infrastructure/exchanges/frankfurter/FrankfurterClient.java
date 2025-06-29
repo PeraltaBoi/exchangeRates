@@ -1,8 +1,13 @@
 package com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.frankfurter;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -11,24 +16,20 @@ import com.currencyexchange.ExchangeRateApi.contracts.external.responses.Frankfu
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Primary
 @Qualifier("frankfurter")
+@Profile("frankfurter")
 public class FrankfurterClient implements IExchangeRateProvider {
 
 	private final RestTemplate restTemplate;
 
-	@Value("${frankfurter.base-url:https://api.frankfurter.dev/v1}")
+	@Value("${exchange-rate.frankfurter.base-url:https://api.frankfurter.dev/v1}")
 	private String baseUrl;
 
 	@Override

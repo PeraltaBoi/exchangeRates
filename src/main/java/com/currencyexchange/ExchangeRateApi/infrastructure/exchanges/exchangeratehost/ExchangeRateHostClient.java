@@ -1,7 +1,13 @@
 package com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.exchangeratehost;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -10,17 +16,16 @@ import com.currencyexchange.ExchangeRateApi.contracts.external.responses.Exchang
 import com.currencyexchange.ExchangeRateApi.domain.CurrencyPair;
 import com.currencyexchange.ExchangeRateApi.domain.ExchangeRatesFromBase;
 import com.currencyexchange.ExchangeRateApi.infrastructure.exchanges.IExchangeRateProvider;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Primary
 @Qualifier("exchangeRateHost")
+@Profile("exchangeRateHost")
 public class ExchangeRateHostClient implements IExchangeRateProvider {
 
 	private final RestTemplate restTemplate;
@@ -28,11 +33,15 @@ public class ExchangeRateHostClient implements IExchangeRateProvider {
 	@Value("${exchange-rate.host.base-url:https://api.exchangerate.host}")
 	private String baseUrl;
 
+	@Value("${exchange-rate.host.api-key}")
+	private String apiKey;
+
 	@Override
 	public Optional<ExchangeRatesFromBase> getAllRates() {
 		try {
 			String url = UriComponentsBuilder.fromUriString(baseUrl)
 					.path("/live")
+					.queryParam("access_key", apiKey)
 					.build()
 					.toUriString();
 
@@ -49,9 +58,8 @@ public class ExchangeRateHostClient implements IExchangeRateProvider {
 					response.getSource(),
 					response.getQuotes().entrySet().stream()
 							.collect(Collectors.toMap(
-									entry -> new CurrencyPair(entry.getKey().substring(0,3), entry.getKey().substring(3)),
-									Map.Entry::getValue))
-			));
+									entry -> new CurrencyPair(entry.getKey().substring(0, 3), entry.getKey().substring(3)),
+									Map.Entry::getValue))));
 
 		} catch (Exception e) {
 			log.error("Error fetching exchange rates from ExchangeRate.host", e);

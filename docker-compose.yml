@@ -9,6 +9,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_REDIS_HOST: ${REDIS_HOST}
       SPRING_REDIS_PORT: ${REDIS_PORT}
+      ER-HOST_APIKEY: ${ER-HOST_APIKEY}
     depends_on:
       - db
       - redis

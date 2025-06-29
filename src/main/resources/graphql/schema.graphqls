@@ -1,0 +1,109 @@
+# ================== #
+#   Query Type       #
+# ================== #
+
+"""
+Defines all available queries.
+"""
+type Query {
+  """
+  Retrieve exchange rate(s) for a given base currency.
+  If 'to' is not provided, all rates for the base currency are returned.
+  """
+  rates(from: String!, to: String): [CurrencyRate]
+
+  """
+  Convert a specific amount from a base currency to one or more target currencies.
+  """
+  convert(from: String!, to: [String!]!, amount: BigDecimal!): [ConvertedAmount]
+
+  """
+  Retrieves all API keys associated with a user.
+  """
+  userKeys(credentials: UserAuthInput!): [ID!]
+
+  """
+  Validates if a given API key is active and valid.
+  """
+  checkApiKey(key: ID!): Boolean
+}
+
+
+# ================== #
+#   Mutation Type    #
+# ================== #
+
+"""
+Defines all available mutations for modifying data.
+"""
+type Mutation {
+  """
+  Signs up a new user. Returns true on success.
+  """
+  signUp(credentials: UserAuthInput!): Boolean
+
+  """
+  Checks user credentials. Throws an error if invalid.
+  """
+  checkSignIn(credentials: UserAuthInput!): Boolean
+
+  """
+  Generates a new API key for the user.
+  """
+  generateApiKey(credentials: UserAuthInput!): ID
+
+  """
+  Revokes a user's API key. Returns true on success.
+  """
+  revokeApiKey(key: ID!, credentials: UserAuthInput!): Boolean
+}
+
+
+# ================== #
+#   Object Types     #
+# ================== #
+
+"""
+A key-value pair representing a currency and its exchange rate.
+"""
+type CurrencyRate {
+  currency: String!
+  rate: BigDecimal!
+}
+
+"""
+A key-value pair representing a currency and a converted amount.
+"""
+type ConvertedAmount {
+  currency: String!
+  amount: BigDecimal!
+}
+
+
+# ================== #
+#   Input Types      #
+# ================== #
+
+"""
+Input object for user authentication, containing username and password.
+"""
+input UserAuthInput {
+  username: String!
+  password: String!
+}
+
+
+# ================== #
+#   Scalar Types     #
+# ================== #
+
+"""
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache.
+Here we use it for API Keys (UUID).
+"""
+scalar ID
+
+"""
+The `BigDecimal` scalar type represents a signed, arbitrary-precision decimal value.
+"""
+scalar BigDecimal

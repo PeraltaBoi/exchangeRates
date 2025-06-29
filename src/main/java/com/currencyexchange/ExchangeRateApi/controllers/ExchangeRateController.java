@@ -13,15 +13,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ConvertedAmountsResponseDTO;
-import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ExchangeRatesResponseDTO;
 import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ErrorResponseDTO;
-
+import com.currencyexchange.ExchangeRateApi.contracts.internal.rest.responses.ExchangeRatesResponseDTO;
 import com.currencyexchange.ExchangeRateApi.services.interfaces.IRateService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,8 +35,8 @@ public class ExchangeRateController {
 	@GetMapping("/rates")
 	@Operation(summary = "Get exchange rates", description = "Retrieve exchange rate(s) for a given base currency. Optionally specify a target currency to get a single conversion rate.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Exchange rate(s) retrieved successfully", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ExchangeRatesResponseDTO.class))),
-			@ApiResponse(responseCode = "400", description = "No rates found for requested currency/currencies", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ErrorResponseDTO.class)))
+			@ApiResponse(responseCode = "200", description = "Exchange rate(s) retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExchangeRatesResponseDTO.class))),
+			@ApiResponse(responseCode = "400", description = "No rates found for requested currency/currencies", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseDTO.class)))
 	})
 	public ResponseEntity<ExchangeRatesResponseDTO> getRates(
 			@Parameter(description = "Base currency code (e.g., USD)", required = true) @RequestParam String from,
@@ -55,8 +56,8 @@ public class ExchangeRateController {
 	@GetMapping("/convert")
 	@Operation(summary = "Convert some amount between currencies")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Value converted successfully", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ConvertedAmountsResponseDTO.class))),
-			@ApiResponse(responseCode = "400", description = "No rates found for requested currency/currencies", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ErrorResponseDTO.class)))
+			@ApiResponse(responseCode = "200", description = "Value converted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConvertedAmountsResponseDTO.class))),
+			@ApiResponse(responseCode = "400", description = "No rates found for requested currency/currencies", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseDTO.class)))
 	})
 	public ResponseEntity<ConvertedAmountsResponseDTO> ConvertAmount(
 			@Parameter(description = "Base currency code (e.g., USD)", required = true) @RequestParam String from,

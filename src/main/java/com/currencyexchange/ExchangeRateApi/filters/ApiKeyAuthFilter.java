@@ -33,31 +33,35 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
       FilterChain filterChain)
       throws ServletException, IOException {
 
-    UUID apiKeyValue = Optional.ofNullable(request.getHeader(headerName))
-        .map(UUID::fromString).orElse(null);
+    try {
+      UUID apiKeyValue = Optional.ofNullable(request.getHeader(headerName))
+          .map(UUID::fromString).orElse(null);
 
-    if (apiKeyValue == null) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-
-    User user = authenticationService.getUserFromApiKey(apiKeyValue);
-
-    if (user != null) {
-      if (!rateLimitingService.isAllowed(apiKeyValue.toString())) {
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-        response
-            .getWriter()
-            .write("Too many requests. Please try again later.");
-        return; // Stop the filter chain
+      if (apiKeyValue == null) {
+        filterChain.doFilter(request, response);
+        return;
       }
 
-      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null,
-          Collections.emptyList());
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      User user = authenticationService.getUserFromApiKey(apiKeyValue);
 
-      request.setAttribute("authenticatedUser", user);
-    } else {
+      if (user != null) {
+        if (!rateLimitingService.isAllowed(apiKeyValue.toString())) {
+          response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+          response
+              .getWriter()
+              .write("Too many requests. Please try again later.");
+          return; // Stop the filter chain
+        }
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null,
+            Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        request.setAttribute("authenticatedUser", user);
+      } else {
+        SecurityContextHolder.clearContext();
+      }
+    } catch (Exception e) {
       SecurityContextHolder.clearContext();
     }
 

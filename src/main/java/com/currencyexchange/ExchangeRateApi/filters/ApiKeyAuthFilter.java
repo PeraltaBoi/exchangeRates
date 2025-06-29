@@ -45,7 +45,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
       User user = authenticationService.getUserFromApiKey(apiKeyValue);
 
       if (user != null) {
-        if (!rateLimitingService.isAllowed(apiKeyValue.toString())) {
+        if (!rateLimitingService.isAllowed(user.getId().toString())) {
           response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
           response
               .getWriter()

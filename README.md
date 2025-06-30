@@ -109,34 +109,74 @@ You will also need an exchangerate.host api key if you desire to use that provid
 
 ## How to Run the Application
 
-### Option 1: Development Environment with Nix
+Running the application involves two main steps: configuring your environment and then launching the application using your preferred method.
 
-A nix flake is provided with all the necessary dependencies for building and developing the project. They include a Java LSP in case you use a text editor such as Vim/Helix/Emacs.
+### 1. Configure Environment Variables
+
+Before you can run the project, you must provide configuration through environment variables. These are used to set things like database connection details, API keys, and other secrets the application needs to function.
+
+Remember that `.env` files should be listed in `.gitignore` and should never be committed to version control.
+
+#### Loading the Variables
+
+Many tools, like Docker Compose, will automatically detect and load the `.env` file. If your method doesn't, you'll need to load the variables into your shell session manually before running the application.
+
+**For Linux/macOS (Bash/Zsh):**
+
+You can `source` the file. This is the most common method.
+
+```bash
+# This command exports all variables defined in the .env file
+set -a
+source .env
+set +a
+```
+
+**For Nushell:**
+
+```nushell
+open .env | from toml | load-env
+```
+
+
+### 2. Choose Your Runtime Environment
+
+Once your environment variables are configured, choose one of the following options to run the application.
+
+#### Option A: Development with Nix
+
+A Nix flake is provided with all necessary dependencies, including a Java LSP for editors like Vim, Helix, or Emacs.
+
+> **Note:** For a seamless experience, consider using [direnv](https://direnv.net/) with `nix develop`. It can automatically load environment variables from your `.env` file whenever you enter the directory.
 
 1.  Enter the development environment:
     ```shell
     nix develop
     ```
-2.  Once inside the shell, run the application:
+2.  (If not using direnv) Load your environment variables as described in Step 1.
+3.  Once inside the shell, run the application:
     ```shell
     mvn spring-boot:run
     ```
 
-For this option, you will need to run the necessary services somehow, you can use docker if you'd like.
-I might add these services to the flake in the future so you can do `nix build` and have everything work.
+You will need to run backing services (like a database) separately, for example, using Docker, locally, or on a server.
 
-### Option 2: Deployment with Docker Compose
+#### Option B: Deployment with Docker Compose
 
-1.  Start all services using Docker Compose:
+The `docker-compose.yml` is configured to build the application image and run it alongside its required services. It automatically loads variables from the `.env` file in the project root.
+
+1.  Ensure your `.env` file is created and populated.
+2.  Start all services in detached mode:
     ```shell
-    docker-compose up -d
+    docker-compose up -d --build
     ```
 
-### Option 3: Local development dependencies
+#### Option C: Local Java & Maven
 
-You can use your locally instaled java and maven, provided you have the correct versions.
-Running the project works the same way as you would inside a nix shell:
-1.  Run the application
+You can use your locally installed Java and Maven, provided they meet the version requirements specified in the project.
+
+1.  Load your environment variables as described in Step 1.
+2.  Run the application:
     ```shell
     mvn spring-boot:run
     ```

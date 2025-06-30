@@ -203,4 +203,7 @@ The GraphQL endpoint is available at `/graphql`. Use an API client to send `POST
 ### Rate Limiting
 
 Authenticated endpoints are rate-limited using a sliding-window algorithm, applied per user.
+
 The default values in `application.properties` are set low (e.g., 2 requests per 10 seconds) to easily demonstrate that the functionality is in place and working correctly.
+
+I wanted to use Bucket4j but unfortunately, I couldn't set it up with the cache I was using, so i had to use a custom implementation.
